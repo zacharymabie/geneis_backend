@@ -19,6 +19,11 @@ app.use(morgan("tiny"));
 // app.use(authJwt());
 // app.use(errorHandler);
 
+//routes
+const usersRouter = require('./routes/users.js');
+app.use(`${api}/users`, usersRouter);
+
+
 mongoose
   .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
