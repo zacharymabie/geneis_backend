@@ -10,7 +10,6 @@ const cors = require("cors");
 require("dotenv/config");
 const api = process.env.API_URL;
 
-
 app.use(cors());
 app.options("*", cors());
 
@@ -20,20 +19,20 @@ app.use(morgan("tiny"));
 // app.use(authJwt());
 // app.use(errorHandler);
 
-mongoose.connect(process.env.CONNECTION_STRING, {
+mongoose
+  .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
-    useUnifiedTopology:true,
-    dbName: 'genesis-database'
-})
-.then(()=>{
-    console.log('Database connection is ready...')
-})
-.catch((err)=>{
-    console.log(err)
-})
+    useUnifiedTopology: true,
+    dbName: "genesis-database",
+  })
+  .then(() => {
+    console.log("Database connection is ready...");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 //APP.Listen starts up the API on a server, specifying the port as it's first parameter
-app.listen(3000, ()=>{
-    console.log("Serving running on 127.0.0.1:3000");
-    console.log(api);
+app.listen(4000, () => {
+  console.log("Serving running on 127.0.0.1:4000");
 });
