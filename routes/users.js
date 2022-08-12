@@ -84,8 +84,6 @@ router.put('/:id',async (req,res)=>{
             username: req.body.username,
             name: req.body.name,
             email: req.body.email,
-            passwordHash: bcrypt.hashSync(req.body.password, 10),
-            isAdmin: req.body.isAdmin,
             age: req.body.age,
             weight: req.body.weight,
             height: req.body.height,
