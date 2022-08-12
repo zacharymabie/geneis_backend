@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+
 const programSchema = mongoose.Schema({
   name: {
     type: String,
@@ -12,6 +14,13 @@ const programSchema = mongoose.Schema({
     type: String,
     default: "",
   },
+  exercises: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Exercise",
+      required: true,
+    },
+  ],
   level: {
     type: Number,
     default: 0,
@@ -20,10 +29,18 @@ const programSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-
-  /* Todo
-    add array field for exercises and users and comments
-    */
+  users: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
 });
 
 programSchema.virtual("id").get(function () {

@@ -18,10 +18,13 @@ const exerciseSchema = mongoose.Schema({
     type: String,
     default: "",
   },
-
-  /* Todo
-    add array field for sets
-    */
+  sets: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Set",
+      required: true,
+    },
+  ],
 });
 
 exerciseSchema.virtual("id").get(function () {
