@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(`/`, async (req,res)=>{
     const postList = await Post.find()
     .populate('author', 'name postname profilePic')
-    .populate({path: 'likes', populate: 'post'})
+    .populate({path: 'likes', populate: 'user'})
     .populate({path: 'comments', populate: 'author'});
 
     if(!postList){
@@ -22,7 +22,7 @@ router.get(`/`, async (req,res)=>{
 router.get(`/:id`, async (req,res)=>{
     const post = await Post.findById(req.params.id)
     .populate('author', 'name postname profilePic')
-    .populate({path: 'likes', populate: 'post'})
+    .populate({path: 'likes', populate: 'user'})
     .populate({path: 'comments', populate: 'author'});
 
     if(!post){
@@ -31,6 +31,24 @@ router.get(`/:id`, async (req,res)=>{
     res.send(post);
 });
 
+router.get(`/get/count`, async (req,res)=>{
+    const postCount = await Post.countDocuments(count => count).clone();
+    if(!postCount){
+        res.status(500).json({'success': false})
+    } 
+    res.send({postCount: postCount});
+});
+
+//Get List of Posts from User ID
+router.get(`/user/:id`, async (req, res) => {
+    const userId = req.params.id;
+    const postList = await Post.find({ user: `${userId}` }).exec();
+  
+    if (!postList) {
+      res.status(500).json({ success: false });
+    }
+    res.status(200).send(postList);
+  });
 
 router.post('/', async (req,res)=>{
     const likes = Promise.all(req.body.likes.map(async like => {
