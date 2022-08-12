@@ -20,9 +20,10 @@ app.use(authJwt());
 app.use(errorHandler);
 
 //routes
-const usersRouter = require('./routes/users.js');
+const usersRouter = require("./routes/users.js");
+const exercisesRouter = require("./routes/exercises.js");
 app.use(`${api}/users`, usersRouter);
-
+app.use(`${api}/exercises`, exercisesRouter);
 
 mongoose
   .connect(process.env.CONNECTION_STRING, {

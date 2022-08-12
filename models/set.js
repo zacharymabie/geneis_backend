@@ -5,7 +5,7 @@ const setSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  Weight: {
+  weight: {
     type: Number,
     required: true,
   },

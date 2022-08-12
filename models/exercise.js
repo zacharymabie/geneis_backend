@@ -35,4 +35,4 @@ exerciseSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.exerciseSchema = mongoose.model("Exercise", exerciseSchema);
+exports.Exercise = mongoose.model("Exercise", exerciseSchema);
