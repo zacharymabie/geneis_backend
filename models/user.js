@@ -33,6 +33,14 @@ const userSchema = mongoose.Schema({
     profilePic:{
         type: String
     },
+    followed:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserFollow"
+    }],
+    following:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserFollow"
+    }]
 })
 
 userSchema.virtual('id').get(function(){
