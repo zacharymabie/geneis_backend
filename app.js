@@ -23,9 +23,12 @@ app.use(errorHandler);
 const usersRouter = require("./routes/users.js");
 const postsRouter = require("./routes/posts.js");
 const exercisesRouter = require("./routes/exercises.js");
+const workoutsRouter = require("./routes/workouts");
 app.use(`${api}/users`, usersRouter);
 app.use(`${api}/posts`, postsRouter);
 app.use(`${api}/exercises`, exercisesRouter);
+app.use(`${api}/workouts`, workoutsRouter);
+
 mongoose
   .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,

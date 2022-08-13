@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 const programSchema = mongoose.Schema({
   name: {
@@ -14,10 +14,10 @@ const programSchema = mongoose.Schema({
     type: String,
     default: "",
   },
-  exercises: [
+  workouts: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Exercise",
+      ref: "Workout",
       required: true,
     },
   ],
@@ -51,4 +51,4 @@ programSchema.set("toJSON", {
   virtuals: true,
 });
 
-exports.ProgramSchema = mongoose.model("Exercise", programSchema);
+exports.Program = mongoose.model("Program", programSchema);

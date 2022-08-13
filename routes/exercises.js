@@ -71,7 +71,7 @@ router.post("/", async (req, res) => {
 
   res.send(exercise);
 });
-
+//Delete an exercise along w/ all sets within
 router.delete("/:id", (req, res) => {
   Exercise.findByIdAndRemove(req.params.id).then(async (exercise) => {
     if (exercise) {
@@ -87,6 +87,51 @@ router.delete("/:id", (req, res) => {
         .json({ success: false, message: "Exercise not found" });
     }
   });
+});
+
+router.put("/:id", async (req, res) => {
+  const setsIds = Promise.all(
+    req.body.sets.map(async (set) => {
+      let newSet = new Set({
+        reps: set.reps,
+        weight: set.weight,
+      });
+
+      newSet = await newSet.save();
+
+      return newSet._id;
+    })
+  );
+
+  const newSetsIdsResolved = await setsIds;
+
+  Exercise.findById(req.params.id).then(async (exercise) => {
+    if (exercise) {
+      await exercise.sets.map(async (set) => {
+        await Set.findByIdAndRemove(set);
+      });
+      return;
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Sets not found" });
+    }
+  });
+
+  const exercise = await Exercise.findByIdAndUpdate(
+    req.params.id,
+    {
+      sets: newSetsIdsResolved,
+      restTime: req.body.restTime,
+      remarks: req.body.remarks,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!exercise) return res.status(404).send("The exercise cannot be changed");
+
+  res.send(exercise);
 });
 
 module.exports = router;
