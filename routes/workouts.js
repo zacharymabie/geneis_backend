@@ -2,9 +2,8 @@ const { Workout } = require("../models/workout");
 const express = require("express");
 const router = express.Router();
 const { User } = require("../models/user");
-const { Exercise } = require("../models/exercise");
 
-//Get list of all workouts
+//Get list of all Workouts
 router.get(`/`, async (req, res) => {
   const workoutList = await Workout.find().populate("exercises");
 
@@ -14,7 +13,7 @@ router.get(`/`, async (req, res) => {
   res.send(workoutList);
 });
 
-//Get a specific workout from ID
+//Get a specific Workout from ID
 router.get(`/:id`, async (req, res) => {
   const workout = await Workout.findById(req.params.id);
 
@@ -26,7 +25,7 @@ router.get(`/:id`, async (req, res) => {
   res.status(200).send(workout);
 });
 
-//Get workouts created by a specific user
+//Get Workouts created by a specific user
 router.get(`/user/:id`, async (req, res) => {
   const userId = req.params.id;
   const workoutList = await Workout.find({ author: `${userId}` }).exec();
@@ -54,6 +53,43 @@ router.post("/", async (req, res) => {
   if (!workout) return res.status(404).send("The workout cannot be created");
 
   res.send(workout);
+});
+
+//Put to change exercises and description of a Workout
+router.put("/:id", async (req, res) => {
+  const workout = await Workout.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name,
+      description: req.body.description,
+      exercises: req.body.exercises,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!workout) return res.status(404).send("The workout cannot be changed");
+
+  res.send(workout);
+});
+
+//Delete a Workout
+router.delete("/:id", (req, res) => {
+  Workout.findByIdAndRemove(req.params.id)
+    .then((workout) => {
+      if (workout) {
+        return res
+          .status(200)
+          .json({ success: true, message: "The workout has been deleted" });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "The workout cannot be found" });
+      }
+    })
+    .catch((err) => {
+      return res.status(400).json({ success: false, error: err });
+    });
 });
 
 module.exports = router;

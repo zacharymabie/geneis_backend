@@ -1,26 +1,25 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userFollowSchema = mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
-    followedUser: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    }
-})
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  followedUser: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+});
 
-userFollowSchema.virtual('id').get(function(){
-    return this._id.toHexString();
-})
+userFollowSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
 
-userFollowSchema.set('toJSON', {
-    virtuals:true
-})
+userFollowSchema.set("toJSON", {
+  virtuals: true,
+});
 
-
-exports.User = mongoose.model('UserFollow', userFollowSchema);
+exports.UserFollow = mongoose.model("UserFollow", userFollowSchema);
 exports.userFollowSchema = userFollowSchema;
