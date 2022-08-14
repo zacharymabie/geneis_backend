@@ -4,6 +4,32 @@ const { Workout } = require("../models/workout");
 const router = express.Router();
 const { User } = require("../models/user");
 const { Comment } = require("../models/comment");
+const multer = require("multer");
+
+const FILE_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+};
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const isValid = FILE_TYPE_MAP[file.mimetype];
+    let uploadError = new Error("invalid image type");
+
+    if (isValid) {
+      uploadError = null;
+    }
+    cb(uploadError, "public/uploads");
+  },
+  filename: function (req, file, cb) {
+    const fileName = file.originalname.split(" ").join("-");
+    const extentsion = FILE_TYPE_MAP[file.mimetype];
+    cb(null, `${fileName}-${Date.now()}.${extentsion}`);
+  },
+});
+
+const uploadOptions = multer({ storage: storage });
 
 //Get list of all programs
 router.get(`/`, async (req, res) => {
@@ -39,7 +65,7 @@ router.get(`/user/:id`, async (req, res) => {
 });
 
 //Post to create a new Program
-router.post("/", async (req, res) => {
+router.post("/", uploadOptions.single("image"), async (req, res) => {
   const user = await User.findById(req.body.author);
   if (!user) return res.status(400).send("Invalid User");
 
@@ -49,9 +75,13 @@ router.post("/", async (req, res) => {
     if (!workout) return res.status(400).send("Invalid Workouts");
   });
 
+  const fileName = req.file.filename;
+  const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+
   let program = new Program({
     name: req.body.name,
     author: req.body.author,
+    image: `${basePath}${fileName}`,
     description: req.body.description,
     workouts: req.body.workouts,
     level: req.body.level,

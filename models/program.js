@@ -10,6 +10,10 @@ const programSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  image: {
+    type: String,
+    default: "",
+  },
   description: {
     type: String,
     default: "",
