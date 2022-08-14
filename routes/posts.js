@@ -3,6 +3,31 @@ const {Like} = require('../models/like.js');
 const {Comment} = require('../models/comment.js');
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+const FILE_TYPE_MAP = {
+    'image/png' : 'png',
+    'image/jpg' : 'jpg',
+    'image/jpeg' : 'jpeg'
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const isValid = FILE_TYPE_MAP[file.mimetype];
+        let uploadError = new Error('invalid image type');
+        if(isValid){
+            uploadError = null
+        }
+        cb(uploadError, 'public/uploads')
+    },
+    filename: function (req, file, cb) {
+      const fileName = file.originalname.split(' ').join('-');
+      const extension = FILE_TYPE_MAP[file.mimetype];
+      cb(null, `POST${fileName}-${Date.now()}.${extension}`)
+    }
+  })
+  
+const uploadOptions = multer({ storage: storage })
 
 //Get LIST of Posts
 router.get(`/`, async (req,res)=>{
@@ -49,7 +74,50 @@ router.get(`/user/:id`, async (req, res) => {
     res.status(200).send(postList);
   });
 
-router.post('/', async (req,res)=>{
+
+//New Post
+router.post('/', uploadOptions.single('image'), async (req,res)=>{
+
+    let url = '';
+    if(req.file){
+        const fileName = req.file.filename
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        url = `${basePath}${fileName}`
+    }
+
+    let post = new Post({
+        author: req.body.author,
+        caption: req.body.caption,
+        image: url,
+        likes: [],
+        comments: []
+    })
+    post = await post.save();
+    if(!post)
+        return res.status(400).send('post cannot be created');
+
+    res.send(post);
+})
+
+//change caption
+router.put('/:id',async (req,res)=>{
+    const post = await Post.findByIdAndUpdate(
+        req.params.id,
+        {
+            caption: req.body.caption
+        },
+        {new:true}
+    )
+    if(!post)
+    return res.status(400).send('post cannot be created');
+
+    res.send(post);
+})
+
+//change likes
+router.put('/like/:id',async (req,res)=>{
+    if(!req.body.likes)return res.status(400).send("Empty parameters")
+
     const likes = Promise.all(req.body.likes.map(async like => {
         let newLike = new Like({
             post: like.post,
@@ -58,6 +126,23 @@ router.post('/', async (req,res)=>{
         return newLike._id;
     }))
     const likesArr = await likes;
+
+    const post = await Post.findByIdAndUpdate(
+        req.params.id,
+        {
+            likes: likesArr
+        },
+        {new:true}
+    )
+    if(!post)
+    return res.status(400).send('post cannot be created');
+
+    res.send(post);
+})
+
+//change comments
+router.put('/comment/:id',async (req,res)=>{
+    if(!req.body.comments)return res.status(400).send("Empty parameters")
 
     const comments = Promise.all(req.body.comments.map(async comment => {
         let newComment = new Comment({
@@ -70,25 +155,11 @@ router.post('/', async (req,res)=>{
     }))
     const commentsArr = await comments;
 
-    let post = new Post({
-        author: req.body.author,
-        caption: req.body.caption,
-        image: req.body.image,
-        likes: likesArr,
-        comments: commentsArr
-    })
-    post = await post.save();
-    if(!post)
-        return res.status(400).send('post cannot be created');
 
-    res.send(post);
-})
-
-router.put('/:id',async (req,res)=>{
     const post = await Post.findByIdAndUpdate(
         req.params.id,
         {
-            caption: req.body.caption
+            comments: commentsArr
         },
         {new:true}
     )

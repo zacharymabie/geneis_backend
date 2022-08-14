@@ -5,7 +5,6 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const e = require('express');
 
 const FILE_TYPE_MAP = {
     'image/png' : 'png',
