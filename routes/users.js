@@ -1,9 +1,36 @@
 const {User} = require('../models/user.js')
+const {UserFollow} = require('../models/userFollow.js')
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { UserFollow } = require('../models/userFollow.js');
+const multer = require('multer');
+const e = require('express');
+
+const FILE_TYPE_MAP = {
+    'image/png' : 'png',
+    'image/jpg' : 'jpg',
+    'image/jpeg' : 'jpeg'
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const isValid = FILE_TYPE_MAP[file.mimetype];
+        let uploadError = new Error('invalid image type');
+        if(isValid){
+            uploadError = null
+        }
+        cb(uploadError, 'public/uploads')
+    },
+    filename: function (req, file, cb) {
+      const fileName = file.originalname.split(' ').join('-');
+      const extension = FILE_TYPE_MAP[file.mimetype];
+      cb(null, `PP${fileName}-${Date.now()}.${extension}`)
+    }
+  })
+  
+const uploadOptions = multer({ storage: storage })
+
 
 router.get(`/`, async (req,res)=>{
     // const userList = await User.find().select('name phone email');
@@ -57,7 +84,12 @@ router.post('/login', async (req,res)=>{
 
 })
 
-router.post('/register', async (req,res)=>{
+router.post('/register', uploadOptions.single('profilePic'), async (req,res)=>{
+
+    const fileName = req.file.filename
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+
+
     let user = new User({
         username: req.body.username,
         name: req.body.name,
@@ -67,7 +99,7 @@ router.post('/register', async (req,res)=>{
         age: req.body.age,
         weight: req.body.weight,
         height: req.body.height,
-        profilePic: req.body.profilePic
+        profilePic: `${basePath}${fileName}`
     })
     user = await user.save();
 
@@ -78,7 +110,8 @@ router.post('/register', async (req,res)=>{
 
 })
 
-router.put('/:id',async (req,res)=>{
+router.put('/:id', async (req,res)=>{
+
     const user = await User.findByIdAndUpdate(
         req.params.id,
         {
@@ -88,7 +121,6 @@ router.put('/:id',async (req,res)=>{
             age: req.body.age,
             weight: req.body.weight,
             height: req.body.height,
-            profilePic: req.body.profilePic
         },
         {new:true}
     )
@@ -98,6 +130,62 @@ router.put('/:id',async (req,res)=>{
     res.send(user);
 })
 
+router.put('/setprofilepic/:id', uploadOptions.single('profilePic'), async (req,res)=>{
+    if(!req.file)return res.status(400).send('No image in the request');
+
+    const fileName = req.file.filename
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    const url = `${basePath}${fileName}`;
+
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            profilePic: url
+        },
+        {new:true}
+    )
+    if(!user)
+    return res.status(400).send('user cannot be created');
+
+    res.send(user);
+})
+
+
+router.put('/follows/:id', async (req,res)=>{
+
+    const followers = Promise.all(req.body.followed.map(async follower => {
+        let newFollower = new UserFollow({
+            user: follower.user,
+            followedUser: follower.followedUser
+        })
+        newFollower = await newFollower.save();
+        return newFollower._id;
+    }))
+    const followedArr = await followers;
+
+    const following = Promise.all(req.body.following.map(async following => {
+        let newFollowing = new UserFollow({
+            user: following.user,
+            followedUser: following.followedUser
+        })
+        newFollowing = await newFollowing.save();
+        return newFollowing._id;
+    }))
+    const followingArr = await following;
+
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            followed: followedArr,
+            following: followingArr
+        },
+        {new:true}
+    )
+    if(!user)
+    return res.status(400).send('user cannot be created');
+
+    res.send(user);
+})
 
 router.delete('/:id', (req,res)=>{
     User.findByIdAndRemove(req.params.id).then(async user =>{
