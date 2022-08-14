@@ -118,6 +118,23 @@ router.put("/:id", async (req, res) => {
   res.send(program);
 });
 
+router.delete("/:id", (req, res) => {
+  Program.findByIdAndRemove(req.params.id).then(async (program) => {
+    if (program) {
+      await program.comments.map(async (comment) => {
+        await Comment.findByIdAndRemove(comment);
+      });
+      return res
+        .status(200)
+        .json({ success: true, message: "The program has been deleted" });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Program not found" });
+    }
+  });
+});
+
 module.exports = router;
 
 //Testing
