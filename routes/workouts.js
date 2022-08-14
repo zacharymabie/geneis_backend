@@ -57,6 +57,14 @@ router.post("/", async (req, res) => {
 
 //Put to change exercises and description of a Workout
 router.put("/:id", async (req, res) => {
+  if (req.body.exercises != undefined) {
+    const exercisesIds = req.body.exercises;
+    exercisesIds.map(async (exerciseId) => {
+      const exercise = await Workout.findById(exerciseId);
+      if (!exercise) return res.status(400).send("Invalid Exercises");
+    });
+  }
+
   const workout = await Workout.findByIdAndUpdate(
     req.params.id,
     {
