@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { UserFollow } = require('../models/userFollow.js');
 
 router.get(`/`, async (req,res)=>{
     // const userList = await User.find().select('name phone email');
@@ -99,8 +100,14 @@ router.put('/:id',async (req,res)=>{
 
 
 router.delete('/:id', (req,res)=>{
-    User.findByIdAndRemove(req.params.id).then(user =>{
+    User.findByIdAndRemove(req.params.id).then(async user =>{
         if(user){
+            await user.followed.map( async follower => {
+                await UserFollow.findByIdAndRemove(follower)
+            })
+            await user.following.map( async whoever => {
+                await UserFollow.findByIdAndRemove(whoever)
+            })
             return res.status(200).json({success:true, message:'user is deleted'})
         } else {
             return res.status(404).json({success:false,message:"user not found"})

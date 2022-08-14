@@ -1,5 +1,4 @@
 const {Post} = require('../models/post.js');
-const {post} = require('../models/post.js');
 const {Like} = require('../models/like.js');
 const {Comment} = require('../models/comment.js');
 const express = require('express');
@@ -100,8 +99,14 @@ router.put('/:id',async (req,res)=>{
 })
 
 router.delete('/:id', (req,res)=>{
-    Post.findByIdAndRemove(req.params.id).then(post =>{
+    Post.findByIdAndRemove(req.params.id).then( async post => {
         if(post){
+            await post.likes.map( async like => {
+                await Like.findByIdAndRemove(like)
+            })
+            await post.comments.map( async comment => {
+                await Comment.findByIdAndRemove(comment)
+            })
             return res.status(200).json({success:true, message:'post is deleted'})
         } else {
             return res.status(404).json({success:false,message:"post not found"})
