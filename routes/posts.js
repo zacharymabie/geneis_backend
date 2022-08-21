@@ -55,6 +55,17 @@ router.get(`/:id`, async (req,res)=>{
     res.send(post);
 });
 
+//get likes of a specific post
+router.get(`/likes/:id`, async (req,res)=>{
+    const post = await Post.findById(req.params.id).select("likes")
+    .populate({path: 'likes', populate: 'user'})
+
+    if(!post){
+        res.status(500).json({'success': false})
+    }
+    res.send(post);
+});
+
 router.get(`/get/count`, async (req,res)=>{
     const postCount = await Post.countDocuments(count => count).clone();
     if(!postCount){
@@ -124,7 +135,7 @@ router.put('/like/:id',async (req,res)=>{
 
     const likes = Promise.all(req.body.likes.map(async like => {
         let newLike = new Like({
-            post: like.post,
+            user: like.user,
         })
         newLike = await newLike.save();
         return newLike._id;
