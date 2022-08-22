@@ -4,6 +4,18 @@ const {Comment} = require('../models/comment.js');
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+require("dotenv/config");
+
+
+//cloudinary
+const cloudinary = require('cloudinary')
+const nanoid = require('nanoid')
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+})
+
 
 const FILE_TYPE_MAP = {
     'image/png' : 'png',
@@ -66,6 +78,17 @@ router.get(`/likes/:id`, async (req,res)=>{
     res.send(post);
 });
 
+//get comments of a specific post
+router.get(`/comments/:id`, async (req,res)=>{
+    const post = await Post.findById(req.params.id).select("comments")
+    .populate({path: 'comments', populate: 'author'})
+
+    if(!post){
+        res.status(500).json({'success': false})
+    }
+    res.send(post);
+});
+
 router.get(`/get/count`, async (req,res)=>{
     const postCount = await Post.countDocuments(count => count).clone();
     if(!postCount){
@@ -92,14 +115,24 @@ router.get(`/user/:id`, async (req, res) => {
 
 //New Post
 router.post('/', uploadOptions.single('image'), async (req,res)=>{
-
     let url = '';
-    if(req.file){
-        const fileName = req.file.filename
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-        url = `${basePath}${fileName}`
+    // if(req.file){
+    //     const fileName = req.file.filename
+    //     const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    //     url = `${basePath}${fileName}`
+    // }
+    
+    try{
+        const result = await cloudinary.uploader.upload(req.body.image,{
+            public_id: nanoid(),
+            resource_type: "jpg"
+        })
+        console.log(result)
+        url = result.secure_url
+        // public_id = result.public_id
+    } catch (err) {
+        console.log(err)
     }
-
     let post = new Post({
         author: req.body.author,
         caption: req.body.caption,
