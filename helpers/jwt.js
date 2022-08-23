@@ -13,7 +13,7 @@ function authJwt() {
       path: [
         { url: /\/public\/uploads(.*)/, methods: ["GET", "OPTIONS"] },
         { url: /\/api\/v1\/posts(.*)/, methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"] },
-        {url: /\/api\/v1\/users(.*)/, methods:['GET', 'OPTIONS']},
+        {url: /\/api\/v1\/users(.*)/, methods:['GET', 'OPTIONS', 'PUT']},
         `${api}/users/login`,
         `${api}/users/register`,
         `${api}/users/get/count`,

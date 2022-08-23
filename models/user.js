@@ -40,7 +40,11 @@ const userSchema = mongoose.Schema({
     following:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "UserFollow"
-    }]
+    }],
+    bio: {
+        type: String,
+        default: ""
+    }
 })
 
 userSchema.virtual('id').get(function(){
