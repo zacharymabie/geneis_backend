@@ -20,7 +20,14 @@ function authJwt() {
           url: /\/api\/v1\/workouts(.*)/,
           methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
         },
-        {url: /\/api\/v1\/users(.*)/, methods:['GET', 'OPTIONS', 'PUT', 'DELETE']},
+        {
+          url: /\/api\/v1\/exercises(.*)/,
+          methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+        },
+        {
+          url: /\/api\/v1\/users(.*)/,
+          methods: ["GET", "OPTIONS", "PUT", "DELETE"],
+        },
         `${api}/users/login`,
         `${api}/users/register`,
         `${api}/users/get/count`,

@@ -1,7 +1,10 @@
 const { Exercise } = require("../models/exercise");
 const express = require("express");
 const { User } = require("../models/user");
+const { ExerciseList } = require("../models/exerciseList");
+
 const { Set } = require("../models/set");
+const { route } = require("./workouts");
 const router = express.Router();
 
 //Get list of all exercises
@@ -41,21 +44,23 @@ router.get(`/user/:id`, async (req, res) => {
 router.post("/", async (req, res) => {
   const user = await User.findById(req.body.user);
   if (!user) return res.status(400).send("Invalid User");
+  let newSetsIdsResolved = null;
+  if (req.body.sets) {
+    const setsIds = Promise.all(
+      req.body.sets.map(async (set) => {
+        let newSet = new Set({
+          reps: set.reps,
+          weight: set.weight,
+        });
 
-  const setsIds = Promise.all(
-    req.body.sets.map(async (set) => {
-      let newSet = new Set({
-        reps: set.reps,
-        weight: set.weight,
-      });
+        newSet = await newSet.save();
 
-      newSet = await newSet.save();
+        return newSet._id;
+      })
+    );
 
-      return newSet._id;
-    })
-  );
-
-  const newSetsIdsResolved = await setsIds;
+    newSetsIdsResolved = await setsIds;
+  }
 
   let exercise = new Exercise({
     name: req.body.name,

@@ -47,14 +47,19 @@ const userSchema = mongoose.Schema({
   ],
   bio: {
     type: String,
-    default: ""
-  }
+    default: "",
+  },
+  exerciseList: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Exercise",
+    },
+  ],
 });
-    
 
-userSchema.virtual('id').get(function(){
-    return this._id.toHexString();
-})
+userSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
 
 userSchema.virtual("id").get(function () {
   return this._id.toHexString();
