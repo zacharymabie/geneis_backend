@@ -95,8 +95,8 @@ router.post('/login', async (req,res)=>{
 
 router.post('/register', uploadOptions.single('profilePic'), async (req,res)=>{
 
-    const fileName = req.file.filename
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    // const fileName = req.file.filename
+    // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
 
     let user = new User({
@@ -104,11 +104,11 @@ router.post('/register', uploadOptions.single('profilePic'), async (req,res)=>{
         name: req.body.name,
         email: req.body.email,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
-        isAdmin: req.body.isAdmin,
-        age: req.body.age,
-        weight: req.body.weight,
-        height: req.body.height,
-        profilePic: `${basePath}${fileName}`
+        // isAdmin: req.body.isAdmin,
+        // age: req.body.age,
+        // weight: req.body.weight,
+        // height: req.body.height,
+        // profilePic: `${basePath}${fileName}`
     })
     user = await user.save();
 
