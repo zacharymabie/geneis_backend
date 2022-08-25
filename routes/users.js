@@ -6,6 +6,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
+//cloudinary
+const cloudinary = require('cloudinary')
+const nanoid = require('nanoid')
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET
+})
+
+
 const FILE_TYPE_MAP = {
     'image/png' : 'png',
     'image/jpg' : 'jpg',
@@ -129,13 +139,50 @@ router.put('/:id', async (req,res)=>{
     res.send(user);
 })
 
+//SET BIO
+router.put('/setbio/:id', async (req,res)=>{
+
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            bio: req.body.bio
+        },
+        {new:true}
+    )
+    if(!user)
+    return res.status(400).send('user cannot be created');
+
+    res.send(user);
+})
+
+
 router.put('/setprofilepic/:id', uploadOptions.single('profilePic'), async (req,res)=>{
-    if(!req.file)return res.status(400).send('No image in the request');
-
-    const fileName = req.file.filename
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-    const url = `${basePath}${fileName}`;
-
+    // if(!req.file)return res.status(400).send('No image in the request');
+    
+    // const fileName = req.file.filename
+    // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    // const url = `${basePath}${fileName}`;
+    
+    let url = '';
+    // if(req.file){
+    //     const fileName = req.file.filename
+    //     const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    //     url = `${basePath}${fileName}`
+    // }
+    console.log("LANDED")
+    try{
+        console.log("TRY")
+        const result = await cloudinary.uploader.upload(req.body.image,{
+            public_id: nanoid(),
+            resource_type: "jpg"
+        })
+        console.log(result)
+        url = result.secure_url
+        // public_id = result.public_id
+    } catch (err) {
+        console.log(err)
+    }
+    console.log("FINISHBLOCk")
     const user = await User.findByIdAndUpdate(
         req.params.id,
         {

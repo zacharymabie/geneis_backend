@@ -12,6 +12,7 @@ function authJwt() {
     .unless({
       path: [
         { url: /\/public\/uploads(.*)/, methods: ["GET", "OPTIONS"] },
+<<<<<<< HEAD
         {
           url: /\/api\/v1\/posts(.*)/,
           methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
@@ -21,6 +22,10 @@ function authJwt() {
           methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
         },
         { url: /\/api\/v1\/users(.*)/, methods: ["GET", "OPTIONS"] },
+=======
+        { url: /\/api\/v1\/posts(.*)/, methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"] },
+        {url: /\/api\/v1\/users(.*)/, methods:['GET', 'OPTIONS', 'PUT']},
+>>>>>>> 3aedb2484a80dcf44accacdc304b9968f7161e35
         `${api}/users/login`,
         `${api}/users/register`,
         `${api}/users/get/count`,
