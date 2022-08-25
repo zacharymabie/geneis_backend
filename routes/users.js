@@ -9,7 +9,6 @@ const multer = require("multer");
 //cloudinary
 const cloudinary = require("cloudinary");
 const nanoid = require("nanoid");
-const { route } = require("./workouts.js");
 const { Exercise } = require("../models/exercise.js");
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -98,6 +97,15 @@ router.post("/login", async (req, res) => {
 router.post(
   "/register",
   uploadOptions.single("profilePic"),
+  async (req, res) => {}
+);
+
+// const fileName = req.file.filename
+// const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+
+router.post(
+  "/register",
+  uploadOptions.single("profilePic"),
   async (req, res) => {
     const fileName = req.file.filename;
     const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
@@ -107,11 +115,11 @@ router.post(
       name: req.body.name,
       email: req.body.email,
       passwordHash: bcrypt.hashSync(req.body.password, 10),
-      isAdmin: req.body.isAdmin,
-      age: req.body.age,
-      weight: req.body.weight,
-      height: req.body.height,
-      profilePic: `${basePath}${fileName}`,
+      // isAdmin: req.body.isAdmin,
+      // age: req.body.age,
+      // weight: req.body.weight,
+      // height: req.body.height,
+      // profilePic: `${basePath}${fileName}`
     });
     user = await user.save();
 
