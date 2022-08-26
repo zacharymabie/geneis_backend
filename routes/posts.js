@@ -100,7 +100,7 @@ router.get(`/get/count`, async (req, res) => {
 //Get List of Posts from User ID
 router.get(`/user/:id`, async (req, res) => {
   const userId = req.params.id;
-  const postList = await Post.find({ user: `${userId}` })
+  const postList = await Post.find({ author: `${userId}` })
     .populate("author", "name postname profilePic")
     .populate({ path: "likes", populate: "user" })
     .populate({ path: "comments", populate: "author" })
