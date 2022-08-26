@@ -42,6 +42,7 @@ const uploadOptions = multer({ storage: storage });
 //Get LIST of Posts
 router.get(`/`, async (req, res) => {
   const postList = await Post.find()
+    .sort({timestamp: -1})
     .populate("author", "name postname profilePic")
     .populate({ path: "likes", populate: "user" })
     .populate({ path: "comments", populate: "author" });
@@ -101,6 +102,7 @@ router.get(`/get/count`, async (req, res) => {
 router.get(`/user/:id`, async (req, res) => {
   const userId = req.params.id;
   const postList = await Post.find({ author: `${userId}` })
+    .sort({timestamp: -1})
     .populate("author", "name postname profilePic")
     .populate({ path: "likes", populate: "user" })
     .populate({ path: "comments", populate: "author" })
