@@ -91,7 +91,7 @@ router.put("/:id", async (req, res) => {
   if (req.body.exercises != undefined) {
     const exercisesIds = req.body.exercises;
     exercisesIds.map(async (exerciseId) => {
-      const exercise = await Workout.findById(exerciseId);
+      const exercise = await Exercise.findById(exerciseId);
       if (!exercise) return res.status(400).send("Invalid Exercises");
     });
   }
