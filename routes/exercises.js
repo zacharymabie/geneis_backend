@@ -80,9 +80,11 @@ router.post("/", async (req, res) => {
 router.delete("/:id", (req, res) => {
   Exercise.findByIdAndRemove(req.params.id).then(async (exercise) => {
     if (exercise) {
-      await exercise.sets.map(async (set) => {
-        await Set.findByIdAndRemove(set);
-      });
+      if (exercise.set) {
+        await exercise.sets.map(async (set) => {
+          await Set.findByIdAndRemove(set);
+        });
+      }
       return res
         .status(200)
         .json({ success: true, message: "The exercise has been deleted" });

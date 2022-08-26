@@ -21,6 +21,10 @@ const workoutSchema = mongoose.Schema({
       required: true,
     },
   ],
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 workoutSchema.virtual("id").get(function () {

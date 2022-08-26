@@ -7,7 +7,9 @@ const { Set } = require("../models/set");
 
 //Get list of all Workouts
 router.get(`/`, async (req, res) => {
-  const workoutList = await Workout.find().populate("exercises");
+  const workoutList = await Workout.find()
+    .populate("exercises")
+    .populate({ path: "exercises", populate: "sets" });
 
   if (!workoutList) {
     res.status(500).json({ success: false });
