@@ -204,77 +204,78 @@ router.put(
   }
 );
 
+router.put("/newfollower/:id", async (req, res) => {
+  const followers = Promise.all(
+    req.body.followed.map(async (follower) => {
+      let newFollower = new UserFollow({
+        user: follower.user,
+        followedUser: follower.followedUser,
+      });
+      newFollower = await newFollower.save();
+      return newFollower._id;
+    })
+  );
+  const followedArr = await followers;
 
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      followed: followedArr,
+    },
+    { new: true }
+  );
+  if (!user) return res.status(400).send("user cannot be created");
 
-router.put('/newfollower/:id', async (req,res)=>{
+  res.send(user);
+});
 
-    const followers = Promise.all(req.body.followed.map(async follower => {
-        let newFollower = new UserFollow({
-            user: follower.user,
-            followedUser: follower.followedUser
-        })
-        newFollower = await newFollower.save();
-        return newFollower._id;
-    }))
-    const followedArr = await followers;
+router.put("/newfollowing/:id", async (req, res) => {
+  const following = Promise.all(
+    req.body.following.map(async (following) => {
+      let newFollowing = new UserFollow({
+        user: following.user,
+        followedUser: following.followedUser,
+      });
+      newFollowing = await newFollowing.save();
+      return newFollowing._id;
+    })
+  );
+  const followingArr = await following;
 
-    const user = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-            followed: followedArr,
-        },
-        {new:true}
-    )
-    if(!user)
-    return res.status(400).send('user cannot be created');
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      following: followingArr,
+    },
+    { new: true }
+  );
+  if (!user) return res.status(400).send("user cannot be created");
 
-    res.send(user);
-})
-
-
-router.put('/newfollowing/:id', async (req,res)=>{
-
-    const following = Promise.all(req.body.following.map(async following => {
-        let newFollowing = new UserFollow({
-            user: following.user,
-            followedUser: following.followedUser
-        })
-        newFollowing = await newFollowing.save();
-        return newFollowing._id;
-    }))
-    const followingArr = await following;
-
-    const user = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-            following: followingArr
-        },
-        {new:true}
-    )
-    if(!user)
-    return res.status(400).send('user cannot be created');
-
-    res.send(user);
-})
+  res.send(user);
+});
 
 //get followers
-router.get(`/followers/:id`, async (req,res)=>{
-    const user = await User.findById(req.params.id).select('followed');
+router.get(`/followers/:id`, async (req, res) => {
+  const user = await User.findById(req.params.id).select("followed");
 
-    if(!user){
-        res.status(500).json({message: 'The user with the given ID was not found'})
-    }
-    res.status(200).send(user);
+  if (!user) {
+    res
+      .status(500)
+      .json({ message: "The user with the given ID was not found" });
+  }
+  res.status(200).send(user);
 });
 
 //get following
-router.get(`/following/:id`, async (req,res)=>{
-    const user = await User.findById(req.params.id).select('following');
+router.get(`/following/:id`, async (req, res) => {
+  const user = await User.findById(req.params.id).select("following");
 
-    if(!user){
-        res.status(500).json({message: 'The user with the given ID was not found'})
-    }
-    res.status(200).send(user);
+  if (!user) {
+    res
+      .status(500)
+      .json({ message: "The user with the given ID was not found" });
+  }
+  res.status(200).send(user);
 });
 
 // router.delete('/:id', (req,res)=>{

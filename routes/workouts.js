@@ -32,7 +32,10 @@ router.get(`/:id`, async (req, res) => {
 //Get Workouts created by a specific user
 router.get(`/user/:id`, async (req, res) => {
   const userId = req.params.id;
-  const workoutList = await Workout.find({ author: `${userId}` }).exec();
+  const workoutList = await Workout.find({ author: `${userId}` })
+    .populate("exercises")
+    .populate({ path: "exercises", populate: "sets" })
+    .exec();
 
   if (!workoutList) {
     res.status(500).json({ success: false });
