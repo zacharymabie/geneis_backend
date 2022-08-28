@@ -209,7 +209,7 @@ router.put("/newfollower/:id", async (req, res) => {
     req.body.followed.map(async (follower) => {
       let newFollower = new UserFollow({
         user: follower.user,
-        followedUser: follower.followedUser,
+        // followedUser: follower.followedUser,
       });
       newFollower = await newFollower.save();
       return newFollower._id;
@@ -234,7 +234,7 @@ router.put("/newfollowing/:id", async (req, res) => {
     req.body.following.map(async (following) => {
       let newFollowing = new UserFollow({
         user: following.user,
-        followedUser: following.followedUser,
+        // followedUser: following.followedUser,
       });
       newFollowing = await newFollowing.save();
       return newFollowing._id;
@@ -256,7 +256,9 @@ router.put("/newfollowing/:id", async (req, res) => {
 
 //get followers
 router.get(`/followers/:id`, async (req, res) => {
-  const user = await User.findById(req.params.id).select("followed");
+  const user = await User.findById(req.params.id).select("followed")
+  .populate({ path: "followed", populate: "user" })
+
 
   if (!user) {
     res
@@ -268,7 +270,8 @@ router.get(`/followers/:id`, async (req, res) => {
 
 //get following
 router.get(`/following/:id`, async (req, res) => {
-  const user = await User.findById(req.params.id).select("following");
+  const user = await User.findById(req.params.id).select("following")
+  .populate({ path: "following", populate: "user" });
 
   if (!user) {
     res

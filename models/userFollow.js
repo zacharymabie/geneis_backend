@@ -6,11 +6,11 @@ const userFollowSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  followedUser: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
+  // followedUser: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  //   required: true,
+  // },
 });
 
 userFollowSchema.virtual("id").get(function () {
