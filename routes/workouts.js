@@ -33,6 +33,7 @@ router.get(`/:id`, async (req, res) => {
 router.get(`/user/:id`, async (req, res) => {
   const userId = req.params.id;
   const workoutList = await Workout.find({ author: `${userId}` })
+    .sort({ timestamp: -1 })
     .populate("exercises")
     .populate({ path: "exercises", populate: "sets" })
     .exec();
