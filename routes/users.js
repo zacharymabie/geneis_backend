@@ -168,7 +168,6 @@ router.put(
     //     const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
     //     url = `${basePath}${fileName}`
     // }
-    console.log("LANDED");
     try {
       console.log("TRY");
       const result = await cloudinary.uploader.upload(req.body.image, {
@@ -181,7 +180,6 @@ router.put(
     } catch (err) {
       console.log(err);
     }
-    console.log("FINISHBLOCk");
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {
