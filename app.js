@@ -14,15 +14,13 @@ app.use(cors());
 app.options("*", cors());
 
 //middleware
-app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb" }));
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
 app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 app.use(errorHandler);
-
-
 
 //routes
 const usersRouter = require("./routes/users.js");
@@ -50,6 +48,11 @@ mongoose
   });
 
 //APP.Listen starts up the API on a server, specifying the port as it's first parameter
-app.listen(4000, () => {
-  console.log("Serving running on 127.0.0.1:4000");
+// app.listen(4000, () => {
+//   console.log("Serving running on 127.0.0.1:4000");
+// });
+
+var server = app.listen(process.env.PORT || 4000, function () {
+  var port = server.address().port;
+  console.log(port);
 });
