@@ -97,18 +97,9 @@ router.post("/login", async (req, res) => {
 router.post(
   "/register",
   uploadOptions.single("profilePic"),
-  async (req, res) => {}
-);
-
-// const fileName = req.file.filename
-// const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-
-router.post(
-  "/register",
-  uploadOptions.single("profilePic"),
   async (req, res) => {
-    const fileName = req.file.filename;
-    const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+    // const fileName = req.file.filename;
+    // const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
 
     let user = new User({
       username: req.body.username,
